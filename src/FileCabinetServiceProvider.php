@@ -20,7 +20,7 @@ class  FileCabinetServiceProvider extends ServiceProvider
         require_once ( __DIR__ . '/app/Http/Controllers/UploadFileController.php');
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
 
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations/2020_05_06_224519_create_file_cabinets_table.php');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
 
         // register views
 //        $this->loadViewsFrom(__DIR__.'/resources/views/file_cabinets', 'file_cabinets'); // this has been deprecated
