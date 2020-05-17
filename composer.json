@@ -1,0 +1,20 @@
+{
+    "name": "0config/file-cabinet",
+    "description": "file cabinet",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "P Singh -Home iMac",
+            "email": "74644p@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "ZeroConfig\\FileCabinet\\": "src/"
+        }
+    },
+    "require": {
+    }
+}
