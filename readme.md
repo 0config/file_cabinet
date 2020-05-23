@@ -23,8 +23,11 @@ If config is not done properly, log may end up in standard log
 ## Route example from local / web.php : 
 
 ```php
-// make sure to import  // use ZeroConfig\App\Http\Controllers\UploadFileController;
+// IMPORT BELOW two lines 
+//use Illuminate\Http\Request;
+//use ZeroConfig\FileCabinet\App\Http\Controllers\UploadFileController;
 
+// for file_cabinet starts
 Route::get('/local_files/{model_name}/{model_id}:{channel}::{id}/', function (Request $request) {
 
     $info = UploadFileController::validateRecord($request);
@@ -36,12 +39,15 @@ Route::post('/local_files/{model_name}/{model_id}:{channel}::{id}/', function (R
     return UploadFileController::upsert($request);
 });
 
+// for file_cabinet ENDS 
 
 ```
 
 
 
  ## create view in appropriate local path 
+ 
+ - file name `local_upload.blade.php` location: `resources/views`
 
 ```
 <html>
@@ -97,7 +103,11 @@ this will `UPDATE`  entry for `FileCabinet` model's id= 1, set channel = 5 and `
 
 ## in `User` model : add below 
 
+
+
 ```php
+// import on top
+// use ZeroConfig\FileCabinet\FileCabinet; 
     public function files()
     {
         return $this->hasMany(FileCabinet::class);
