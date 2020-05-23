@@ -148,3 +148,9 @@ see there is `destroy` between routes, rest is same
 if you set it to false ownership is not checked
 BE VERY CAREFUL this will transfer ownership as well.. 
 
+
+
+# IMPORTANT :: if migration does not pick for FileCabinet
+
+Please run `php artisan migrate --path=vendor/0config/file-cabinet/src/database/migrations/`
+
