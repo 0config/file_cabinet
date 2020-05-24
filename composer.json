@@ -16,29 +16,5 @@
         }
     },
     "require": {
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "php artisan migrate --path=vendor/0config/file-cabinet/src/database/migrations/",
-            "@php echo \"\n \n\n \"",
-            "@php echo 'post-install-cmd'"
-        ],
-        "post-update-cmd": [
-            "php artisan migrate --path=vendor/0config/file-cabinet/src/database/migrations/",
-            "@php echo \"\n \n\n \"",
-            "@php echo 'after post-update-cmd'"
-        ],
-        "post-autoload-dump": [
-            "@php echo \"\n \n\n \"",
-            "@php echo 'after post-autoload-dump'"
-        ],
-        "post-root-package-install": [
-            "@php echo \"\n \n\n \"",
-            "@php echo 'after post-root-package-install'"
-        ],
-        "post-create-project-cmd": [
-            "@php echo \"\n \n\n \"",
-            "@php echo 'after post-create-project-cmd'"
-        ]
     }
 }

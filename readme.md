@@ -21,7 +21,12 @@ If config is not done properly, log may end up in standard log
 
 
 
-# Migrate up : `php artisan migrate`
+
+# Migrate  : 
+
+move migration folder to local migration `mv vendor/0config/file-cabinet/src/database/migrations/*.php database/migrations`
+
+migrate up : `php artisan migrate`
 
 #### Note: if migrate up does not work, Please run `php artisan migrate --path=vendor/0config/file-cabinet/src/database/migrations/`
 
