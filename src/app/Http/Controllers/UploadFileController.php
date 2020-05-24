@@ -62,11 +62,9 @@ class UploadFileController extends Controller
             self::errorExit('Current user and Record Owner does not match');
         }
 
-        if( $fileCabinet['model_name'] !==$modelName ) self::errorExit('Improper Model Name. This record belongs to Model : <' . $fileCabinet['model_name']  . ">  NOT  <". $modelName . ">"  );
+        if( $id >0 && $fileCabinet['model_name'] !==$modelName ) self::errorExit('Improper Model Name. This record belongs to Model : <' . $fileCabinet['model_name']  . ">  NOT  <". $modelName . ">"  );
 
 
-        dump($fileCabinet['model_name']);
-        dd($fileCabinet);
 
         $result['fileCabinet'] = $fileCabinet;
 
