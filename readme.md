@@ -1,23 +1,33 @@
 # Enable logging 
 
-add a log channel to `config/logging.php` like this
+add a log channel to `config/logging.php` like this  inside `'channels' => ` node
 
 ```php
 'file_cabinet' => [
             'driver' => 'single',
-            'path' => storage_path('logs/file_cabinet.log'),
-            'level' => 'info',
+            'path'   => storage_path('logs/file_cabinet.log'),
+            'level'  => 'info',
 ], 
 ```
 
-and write to it like this
-
+// Try writing log as below , from you application 
+```php
 Log::channel('file_cabinet')->info('Hello world!!');
+```
 
-
-and see : ` tail -f storage/logs/file_cabinet.log`
+and see : `tail -f storage/logs/file_cabinet.log`
 
 If config is not done properly, log may end up in standard log 
+
+
+
+# Migrate up : `php artisan migrate`
+
+#### Note: if migrate up does not work, Please run `php artisan migrate --path=vendor/0config/file-cabinet/src/database/migrations/`
+
+
+
+
 
 
 ## Route example from local / web.php : 
@@ -160,7 +170,4 @@ BE VERY CAREFUL this will transfer ownership as well..
 
 
 
-# IMPORTANT :: if migration does not pick for FileCabinet
-
-Please run `php artisan migrate --path=vendor/0config/file-cabinet/src/database/migrations/`
 

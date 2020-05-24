@@ -18,6 +18,9 @@
     "require": {
     },
     "scripts": {
+        "post-install-cmd": [
+            "php artisan migrate --path=vendor/0config/file-cabinet/src/database/migrations/"
+        ],
         "post-update-cmd": [
             "php artisan migrate --path=vendor/0config/file-cabinet/src/database/migrations/"
         ]
