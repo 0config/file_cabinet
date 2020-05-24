@@ -40,6 +40,5 @@
             "@php echo \"\n \n\n \"",
             "@php echo 'after post-create-project-cmd'"
         ]
-        ]
     }
 }
