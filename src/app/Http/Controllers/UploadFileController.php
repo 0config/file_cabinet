@@ -15,17 +15,31 @@ use ZeroConfig\FileCabinet\FileCabinet;
 class UploadFileController extends Controller
 {
 
+    public static function getFileType($key)
+    {
+
+        $typeArray = [
+            'audio' => 'audio/*',
+            'video' => 'video/*',
+            'image' => 'image/*',
+            'pdf'   => 'application/pdf',
+            'xls'   => 'application/vnd.ms-excel'
+        ];
+
+        if (array_key_exists($key, $typeArray)) return $typeArray[$key];
+        else self::errorExit(' Mime Type of ' . $key . ' is not allowed ');
+
+    }
+
     public static function validateRecord(Request $request, $checkOwner = true)
     {
 
+        \Log::channel('file_cabinet')->info(' accessing : ' . URL::current() . PHP_EOL . " user info: " . Auth::user());
 
-        \Log::channel('file_cabinet')->info(' accessing : ' . URL::current() . PHP_EOL. " user info: " . Auth::user());
-//        \Log::channel('file_cabinet')->warning( ' accessing : '  . URL::current()   . PHP_EOL .  Auth::user() );
-//        \Log::channel('file_cabinet')->error( ' accessing : '  . URL::current()   . PHP_EOL .  Auth::user() );
-
+        $validatedMimetype = \ZeroConfig\FileCabinet\App\Http\Controllers\UploadFileController::getFileType(request('mimetype'));  // check valid file type
 
         if (Auth::id() === null) self::errorExit(__CLASS__ . " :  works only with authenticated user. Please make sure to have authenticated users  to access this resource. ");
-        // TODO make my own exception
+        //  make my own exception
 
 
         $modelNamePath        = null;
@@ -42,7 +56,8 @@ class UploadFileController extends Controller
         $modelId = (int)\request('model_id');
         $id      = (int)\request('id');
 
-        $modelResult = $modelNamePath::first(); // check if model exists Starts .. that's it for this
+        $modelResult = $modelNamePath::find($modelId); // check if model starts and check by modelId
+
         if (!$modelResult) self::errorExit('No Result in : ' . $modelNamePath . ' for id ' . $modelId); //return ' no result found';
         // model exists ends
 
@@ -62,22 +77,41 @@ class UploadFileController extends Controller
             self::errorExit('Current user and Record Owner does not match');
         }
 
-        if( $id >0 && $fileCabinet['model_name'] !==$modelName ) self::errorExit('Improper Model Name. This record belongs to Model : <' . $fileCabinet['model_name']  . ">  NOT  <". $modelName . ">"  );
+        if ($id > 0 && $fileCabinet['model_name'] !== $modelName) self::errorExit('Improper Model Name. This record belongs to Model : <' . $fileCabinet['model_name'] . ">  NOT  <" . $modelName . ">");
 
 
+        // FOR passed model and id exits check
 
-        $result['fileCabinet'] = $fileCabinet;
+
+        $result['fileCabinet']   = $fileCabinet;
+        $result['validMimetype'] = $validatedMimetype;
 
         return $result;
     }
 
     public static function upsert(Request $request, $checkOwner = true)
     {
+        // TODO move  mime and other check from template to controller
+        // TODO use same logic for
+        //  -   create ,
+        //  -   update / upsert
+        //  -   and destroy
+        //  TODO keep same validation logic as in
+
+        $validatorResponse = self::validateRecord($request, $checkOwner);
+
+        // check mime type defined is same as posted file
 
 
-        self::validateRecord($request, $checkOwner);
+        $file                     = $request->file('image');
+        $fileMimeCategory         = explode('/', $file->getMimeType())[0];
+        $uploadedFileMimeCategory = explode('/', \ZeroConfig\FileCabinet\App\Http\Controllers\UploadFileController::getFileType(request('mimetype')))[0];
 
-        $file = $request->file('image');
+
+        if ($fileMimeCategory != $uploadedFileMimeCategory) {
+            self::errorExit(' Invalid file Format !  Expecting ' . $uploadedFileMimeCategory . ' received ' . $file->getMimeType() );
+        }
+
 
         //Display File Mime Type
         echo 'File Mime Type: ' . $file->getMimeType();
@@ -123,6 +157,7 @@ class UploadFileController extends Controller
 
     public static function destroy(Request $request, $checkOwner = true)
     {
+
 
         $record = self::validateRecord($request, $checkOwner);
         if (!$record['fileCabinet']) self::errorExit(' record does not exist');;

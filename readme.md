@@ -43,16 +43,23 @@ migrate up : `php artisan migrate`
 //use ZeroConfig\FileCabinet\App\Http\Controllers\UploadFileController;
 
 // for file_cabinet starts
-Route::get('/local_files/{model_name}/{model_id}:{channel}::{id}/', function (Request $request) {
 
-    $info = UploadFileController::validateRecord($request);
 
-    return view('local_upload', compact('info'));
+Route::get('/local_files/{mimetype}/{model_name}/{model_id}:{channel}::{id}/', function (Request $request , $mimetype,  $model_name, $model_id, $channel, $id ) {
+
+    $info = UploadFileController::validateRecord($request );
+
+    return view('local_upload', compact('info',  'mimetype', 'model_id', 'model_name', 'channel' ));
 
 });
-Route::post('/local_files/{model_name}/{model_id}:{channel}::{id}/', function (Request $request) {
-    return UploadFileController::upsert($request);
+Route::post('/local_files/{mimetype}/{model_name}/{model_id}:{channel}::{id}/', function (Request $request , $mimetype,  $model_name, $model_id, $channel, $id ) {
+    return UploadFileController::upsert($request, $mimetype);
 });
+
+Route::get('/local_files/{mimetype}/destroy/{model_name}/{model_id}:{channel}::{id}/', function (Request $request) {
+    return UploadFileController::destroy($request);
+});
+
 
 // for file_cabinet ENDS 
 
@@ -66,30 +73,96 @@ Route::post('/local_files/{model_name}/{model_id}:{channel}::{id}/', function (R
 
 ```
 <html>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<title> File Cabinet : Universal File Manager </title>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
 <body>
-<?php
+<div class="container">
+    <br><br>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
 
-echo Form::open(array('url' => ($_SERVER['REQUEST_URI']), 'files' => 'true'));
-echo 'Select the file to upload.';
-echo Form::file('image',  ['required' => 'true']);
-echo $info['fileCabinet']->file_name ?? '';
+            <h1 class="text-center"> File Manager </h1> <br>
+            <?php
+            echo Form::open(array('url' => ($_SERVER['REQUEST_URI']), 'files' => 'true', 'data-toggle' => "validator", 'role' => "form", 'required' => 'true', "novalidate" => "true"));
+            ?>
+            <div class="form-group">
+                <label for="inputImage" class="control-label">Image File</label>
+
+                <?php
+                echo Form::file('image', ['required' => 'true', 'class' => 'form-control', 'accept' => $info['validMimetype'] ]); // if $mimeType is not passed default will be image type
+                echo $info['fileCabinet']->file_name ?? '';
+                ?>
+                <div class="help-block with-errors">
+                    <ul class="list-unstyled">
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputName" class="control-label">Name</label>
+                <?php
+                echo Form::text('name', $info['fileCabinet']->name ?? '', ['required' => 'true', 'class' => 'form-control']);
+                ?>
+                <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                <div class="help-block with-errors">
+                    <ul class="list-unstyled">
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+            <br><br><br>
+            <?php
+            $uploadUpdate = $info['fileCabinet'] ? ' Update ' : ' Upload ';
+            echo Form::submit($uploadUpdate . ' File', ['required' => 'true', 'class' => 'form-control btn btn-primary']);
+            ?>
+
+            <?php echo Form::close();
+            //    if ($info['fileCabinet']) dump($info['fileCabinet']); ?>
 
 
-
-echo "<BR> name" . Form::text('name', $info['fileCabinet']->name ?? '');
-
-
-echo "<BR>";
+            <hr/>
 
 
-$uploadUpdate = $info['fileCabinet'] ? ' Update ' :  ' Upload ';
+           @php( $allFiles =  ( \ZeroConfig\FileCabinet\FileCabinet::select(['id', 'model_name', 'model_id', 'name', 'file_name', 'channel'])
+                            ->where('user_id',  \Illuminate\Support\Facades\Auth::id()) )
+                            ->where('model_name', $model_name)
+                            ->where('model_id', $model_id)
+                            ->where('channel', $channel)
+                            ->get()
+            )
 
-echo Form::submit( $uploadUpdate . ' File');
-echo Form::close();
+            @foreach($allFiles as $fileArr)
+                model_id-{{ $fileArr->model_id }}  ::
+                id-{{ $fileArr->id }}  ::
+                channel-{{ $fileArr->channel }}  ::
+                file_name-{{ $fileArr->file_name }} ::
+                <BR>
+                    <BR>
+            @endforeach
 
-if( $info['fileCabinet'] ) dump ($info['fileCabinet']);
-?> </body>
+
+        </div>
+
+
+        <div class="col-md-2"></div>
+    </div>
+
+
+</div>
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://1000hz.github.io/bootstrap-validator/dist/validator.min.js"></script>
+</body>
 </html>
+
+
 
 
 ```
@@ -97,18 +170,19 @@ if( $info['fileCabinet'] ) dump ($info['fileCabinet']);
 
 ## make sure to load this template from route file : 
 ```
-/local_files/FileCabinet/1:1::0
-/{static_path}/{ModelName}/{modelId}:{channel}:{fileCabId}/
+/local_files/image/FileCabinet/3:1::0
+
+/{static_path}/{mimetype}/{ModelName}/{modelId}:{channel}:{fileCabId}/
 fileCabId = 0 ; // new file
 fileCabId > 0 ; // will edit record based on this value 
 ```
 
 
-eg: /local_files/FileCabinet/2:1::0
+eg: /local_files/image/FileCabinet/3:1::0
 this will `CREATE` an entry for `FileCabinet` model's id= 2, set channel = 1 and `::0` will create  a new record 
 
 
-e.g.: /local_files/FileCabinet/1:5::12
+e.g.: /local_files/image/FileCabinet/1:5::12
 this will `UPDATE`  entry for `FileCabinet` model's id= 1, set channel = 5 and `::12` will update FileCabinet.id = 12 
 
 
@@ -161,7 +235,7 @@ you should get desired response.
 
 # Destroy 
 
-/local_files/destroy/User/2:1::11
+/local_files/{mimetype}/destroy/{model_name}/{model_id}:{channel}::{id}/
 
 see there is `destroy` between routes, rest is same 
 
