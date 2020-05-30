@@ -123,7 +123,7 @@ class UploadFileController extends Controller
         //Move Uploaded File
         $destinationPath  = 'storage'; // this is symlink
         $move             = $file->move($destinationPath, rand(100, 999) . $file->getClientOriginalName());
-        $fileNameWithPath = $move->getPath() . '/' . $move->getFilename();
+        $fileNameWithPath = '/'. $move->getPath() . '/' . $move->getFilename();
 
 
         $insUpd = FileCabinet::updateOrCreate(

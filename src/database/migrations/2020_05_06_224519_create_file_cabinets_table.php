@@ -29,6 +29,8 @@ public function up()
         $table->softDeletes();
         $table->unsignedInteger('user_id');
 
+        $table->index(['id', 'channel', 'model_name', 'model_id', 'deleted_at' ]);
+
         $table->timestamps();
     });
 }
