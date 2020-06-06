@@ -109,12 +109,12 @@ class UploadFileController extends Controller
 
 
         if ($fileMimeCategory != $uploadedFileMimeCategory) {
-            self::errorExit(' Invalid file Format !  Expecting ' . $uploadedFileMimeCategory . ' received ' . $file->getMimeType() );
+            self::errorExit(' Invalid file Format !  Expecting ' . $uploadedFileMimeCategory . ' received ' . $file->getMimeType());
         }
 
 
         //Display File Mime Type
-        echo 'File Mime Type: ' . $file->getMimeType();
+//        echo 'File Mime Type: ' . $file->getMimeType();
 
 
         $fileCabInfo = $_POST;
@@ -123,7 +123,8 @@ class UploadFileController extends Controller
         //Move Uploaded File
         $destinationPath  = 'storage'; // this is symlink
         $move             = $file->move($destinationPath, rand(100, 999) . $file->getClientOriginalName());
-        $fileNameWithPath = '/'. $move->getPath() . '/' . $move->getFilename();
+        $fileNameWithPath = '/' . $move->getPath() . '/' . $move->getFilename();
+        $model_id         = (int)request('model_id');
 
 
         $insUpd = FileCabinet::updateOrCreate(
@@ -134,7 +135,7 @@ class UploadFileController extends Controller
              , 'name'       => $fileCabInfo['name']
              , 'file_name'  => $fileNameWithPath
              , 'model_name' => request('model_name')
-             , 'model_id'   => (int)request('model_id')
+             , 'model_id'   => $model_id
 
              , 'user_id'    => Auth::id()
             ]
@@ -150,7 +151,15 @@ class UploadFileController extends Controller
             $resp['type']    = 'update';
             $resp['changes'] = $insUpd->getChanges();
         }
-        return $resp;
+        $imageSwapId = "image_" . $model_id;
+        echo "<body onload='
+                opener.document.getElementById( \"$imageSwapId\").src = \"$fileNameWithPath\";
+                self.close();
+                '>
+</body><a href='#' onclick='self.close()'>Close this Window</a>";
+        dump($resp);
+        return " THIS SHOULD BE A POPUP elese it will not auto close.. ..  <BR> <h2> if this is a pop up and, you see see this >  Then parent  does not have id : image_{$model_id} </h2> updated image is auto updated.. if everything is setup up correct.. ";
+//        return $resp;
 
 
     }
