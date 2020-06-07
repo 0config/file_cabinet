@@ -183,6 +183,35 @@ class UploadFileController extends Controller
         return $response;
     }
 
+
+    public function sortorder(Request $request)
+    {
+        sleep(0.3);
+
+        \Illuminate\Support\Facades\DB::beginTransaction();
+        try {
+            $inputArray =  json_decode($request->get('json'), true);
+            foreach ($inputArray as $key => $value) {
+
+                \Illuminate\Support\Facades\DB::table('file_cabinets')->where('id', '=',  $key)->update(['sortorder' => $value]);
+                // $generateError = \DB::table('ERR')->where('id', '=',  $key)->update(['sortorder' => $value]);
+
+            }
+            \Illuminate\Support\Facades\DB::commit();
+
+            return    \Response::json(["status" =>  "OK", "success" => true,  "data" => $inputArray]);
+        } catch (\Exception $e) {
+            //if there is an error/exception in the above code before commit, it'll rollback
+            \Illuminate\Support\Facades\DB::rollBack();
+
+
+            return response(["status" =>  "ERROR", "success" => false,  "data" => $inputArray], 409)
+                ->header('Content-Type', 'application/json');
+        }
+    }
+
+
+
     public static function errorExit($message = 'default message here')
     {
         \Log::channel('file_cabinet')->error(' accessing : ' . URL::current() . PHP_EOL . $message . PHP_EOL);
