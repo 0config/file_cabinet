@@ -1,6 +1,4 @@
-# Enable logging 
 
-add a log channel to `config/logging.php` like this  inside `'channels' => ` node
 
 Note: if you get `'Unable to create the directory' error in laravel (on the server)`
 - please make sure you have `storage` folder in `public` folder 
@@ -10,6 +8,10 @@ Note: if you get `'Unable to create the directory' error in laravel (on the serv
 ll -d storage/
 drwxrwxrwx 2 username username 52 Nov 12 15:56 storage/
 ```
+
+# Enable logging 
+
+add a log channel to `config/logging.php` like this  inside `'channels' => ` node
 
 ```php
 'file_cabinet' => [
