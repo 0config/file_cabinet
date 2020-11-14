@@ -2,6 +2,15 @@
 
 add a log channel to `config/logging.php` like this  inside `'channels' => ` node
 
+Note: if you get `'Unable to create the directory' error in laravel (on the server)`
+- please make sure you have `storage` folder in `public` folder 
+- with permission `chmod 777 storage/`
+- please see how this file permission should look like below 
+```bash
+ll -d storage/
+drwxrwxrwx 2 username username 52 Nov 12 15:56 storage/
+```
+
 ```php
 'file_cabinet' => [
             'driver' => 'single',
@@ -469,3 +478,6 @@ BE VERY CAREFUL this will transfer ownership as well..
 </html>
 
 ```
+
+
+
